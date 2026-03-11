@@ -1,8 +1,8 @@
-# Local AI Translator
+# Glocal Translate
 
 A completely private, open-source, and local translation application running on your CPU. It uses the `llama-cpp-python` backend and `Qwen2.5-1.5B-Instruct-GGUF` to provide blazing fast translations and context-aware word suggestions entirely offline.
 
-![Local Translator UI Demo](https://via.placeholder.com/800x400.png?text=Local+AI+Translator+UI+Demo) *(Note: Replace with actual screenshot)*
+![Glocal Translate UI Demo](https://via.placeholder.com/800x400.png?text=Glocal+Translate+UI+Demo) *(Note: Replace with actual screenshot)*
 
 ## Features
 

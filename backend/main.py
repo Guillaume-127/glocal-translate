@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from llama_cpp import Llama
 
-app = FastAPI(title="Local Translation AI")
+app = FastAPI(title="Glocal Translate")
 
 # Configure CORS
 app.add_middleware(
