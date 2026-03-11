@@ -2,7 +2,7 @@
 
 A completely private, open-source, and local translation application running on your CPU. It uses the `llama-cpp-python` backend and `Qwen2.5-1.5B-Instruct-GGUF` to provide blazing fast translations and context-aware word suggestions entirely offline.
 
-![Glocal Translate UI Demo](file:///C:/Users/guill/.gemini/antigravity/brain/c1e38a62-4388-49a6-9f83-6640f4196980/237-0.png)
+![Glocal Translate UI Demo](Preview.png)
 
 ## Features
 
