@@ -57,3 +57,4 @@ Leave the black console window open while using the app. To stop it, simply **cl
 ## License
 
 MIT License. You are free to modify and distribute this software.
+"# glocal-translate" 
