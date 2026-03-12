@@ -55,7 +55,8 @@ def generate_translation(text: str, source_lang: str, target_lang: str) -> str:
         raise HTTPException(status_code=500, detail="Model is not loaded.")
     
     prompt = f"""<|im_start|>system
-You are an expert translator. Translate the following text from {source_lang} to {target_lang}. Provide ONLY the translated text, without explanation, quotes, or markdown formatting. Keep the tone identical to the source.
+You are an expert, bilingual translator. Translate the following text from {source_lang} to {target_lang}.
+CRITICAL INSTRUCTION: Do NOT translate word-for-word. Focus entirely on the CONTEXT, MEANING, and TONE. Provide a natural, fluent, and idiomatic translation that sounds like a native speaker wrote it. Provide ONLY the translated text, without explanation, quotes, or markdown formatting.
 <|im_end|>
 <|im_start|>user
 {text}
@@ -68,7 +69,7 @@ You are an expert translator. Translate the following text from {source_lang} to
             prompt,
             max_tokens=512,
             stop=["<|im_end|>"],
-            temperature=0.1, # Low temperature for accurate translation
+            temperature=0.25, # Slightly higher temperature for more natural/contextual phrasing
             top_k=40,
             top_p=0.9,
         )
