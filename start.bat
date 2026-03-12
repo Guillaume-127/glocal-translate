@@ -45,7 +45,7 @@ IF ERRORLEVEL 1 (
 )
 
 echo [INFO] Opening user interface in 3 seconds...
-start /b powershell -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://127.0.0.1:8000/'"
+start /b powershell -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://127.0.0.1:8080/'"
 
 echo [INFO] Starting FastAPI backend...
 echo =======================================================
@@ -53,6 +53,6 @@ echo [SUCCESS] The application is now running.
 echo [IMPORTANT] DO NOT close this window. Minimalize it if you want.
 echo [IMPORTANT] To completely stop the app, press CTRL+C or close this window.
 echo =======================================================
-"venv\Scripts\uvicorn.exe" backend.main:app --host 127.0.0.1 --port 8000
+"venv\Scripts\uvicorn.exe" backend.main:app --host 127.0.0.1 --port 8080
 
 exit /b 0

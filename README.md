@@ -27,7 +27,7 @@ A completely private, open-source, and local translation application running on 
    - The script will automatically create a Python virtual environment.
    - It will download the necessary model (~1.1GB) from Hugging Face into a `models/` folder.
 4. **Translate**:
-   - The UI will automatically pop open in your default browser at `http://127.0.0.1:8000/`.
+   - The UI will automatically pop open in your default browser at `http://127.0.0.1:8080/`.
    - Start typing!
 
 ## Project Structure
