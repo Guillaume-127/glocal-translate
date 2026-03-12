@@ -83,7 +83,8 @@ def generate_suggestion(text: str, source_lang: str, target_lang: str) -> str:
     
     # Context-aware completion to help user write their sentence
     prompt = f"""<|im_start|>system
-You are a writing assistant helping the user type a sentence in {source_lang} that they want to translate to {target_lang}. Given their current incomplete text, suggest the next 1 to 3 words to naturally continue the sentence. Provide ONLY the suggested words, nothing else.
+You are a writing assistant helping the user type a sentence in {source_lang}. The user has written an incomplete sentence.
+CRITICAL INSTRUCTION: Provide ONLY the NEXT 1 to 3 words that naturally continue the sentence. DO NOT repeat what the user already wrote. DO NOT explain. Just output the next logical words.
 <|im_end|>
 <|im_start|>user
 {text}
