@@ -58,29 +58,6 @@ header {
     gap: 1.25rem;
 }
 
-/* Discrete Console Button */
-.console-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: rgba(48, 54, 61, 0.4);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    font-family: var(--font-family);
-    font-size: 0.8rem;
-    font-weight: 500;
-    padding: 0.4rem 0.75rem;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.console-btn:hover {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-    background: rgba(88, 166, 255, 0.1);
-}
-
 .logo {
     display: flex;
     align-items: center;
@@ -512,6 +489,50 @@ textarea::placeholder {
     box-shadow: 0 4px 10px rgba(210, 153, 34, 0.4);
 }
 
+/* Footer & Discrete Bottom Console Button */
+footer {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(48, 54, 61, 0.4);
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.console-btn-footer {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(22, 27, 34, 0.7);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-family: var(--font-family);
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.45rem 0.85rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.console-btn-footer:hover {
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+    background: rgba(88, 166, 255, 0.1);
+}
+
+.footer-credits {
+    opacity: 0.65;
+    font-size: 0.8rem;
+}
+
 /* Console Modal Styles */
 .console-modal {
     position: fixed;
@@ -658,5 +679,10 @@ textarea::placeholder {
     
     .swap-btn:hover {
         transform: translateY(-2px);
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
     }
 }
