@@ -225,6 +225,29 @@ def generate_enhanced_prompt(text: str, target_type: str) -> str:
             "Write a vivid, detailed, hierarchical scene description in English: main subject, foreground/background details, lighting quality, atmosphere, and camera framing.\n"
             "CRITICAL: Output ONLY the final enhanced English prompt text."
         )
+    elif target_type == "image-boogu":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Boogu / Boogu-Image-0.1 (10B Multimodal Model).\n"
+            "Boogu excels at complex multi-subject layouts, design intent, and bilingual text integration.\n"
+            "Write a clear, structured natural language brief in English detailing design layout, subject positioning, lighting mood, and exact text elements in quotes if requested.\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
+    elif target_type == "image-anima":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Anima (Specialized Anime & 2.5D Illustration Model).\n"
+            "Anima relies on Danbooru-style structured tags combined with descriptive natural language.\n"
+            "Format the prompt starting with quality/aesthetic tags (masterpiece, best quality, score_9, safe), followed by subject tags (1girl, 1boy, character description), pose/clothing, and background atmosphere.\n"
+            "Append a recommended Negative Prompt block at the end:\n"
+            "Negative Prompt: worst quality, low quality, score_1, score_2, score_3, distorted\n"
+            "CRITICAL: Output ONLY the final formatted prompt in English."
+        )
+    elif target_type == "image-krea":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Krea AI (Krea 1 & Krea 2 Realtime Engine).\n"
+            "Krea 2 excels equally at ultra-photorealism (hyper-realistic portraits, studio lighting, skin micro-textures, camera specs) AND vibrant digital art / concept design.\n"
+            "Structure a compelling prompt detailing realistic optics (85mm f/1.4 lens, soft rim lighting, subsurface scattering) or high-end artistic aesthetics.\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
     elif target_type == "image-sdxl":
         sys_instruction = (
             "You are a Master Prompt Engineer for SDXL (Stable Diffusion XL).\n"
@@ -246,13 +269,6 @@ def generate_enhanced_prompt(text: str, target_type: str) -> str:
             "You are a Master Prompt Engineer for Ideogram 2.0 / Ideogram 4.\n"
             "Ideogram excels at text rendering, graphic design, typography, posters, vector art, and logo design.\n"
             "Focus on clean composition, graphic style (vintage poster, neon typography, minimalist vector), color palette, and EXACT text enclosed in quotes (e.g., featuring text \"YOUR TEXT HERE\").\n"
-            "CRITICAL: Output ONLY the final enhanced prompt in English."
-        )
-    elif target_type == "image-krea":
-        sys_instruction = (
-            "You are a Master Prompt Engineer for Krea AI (Krea 1 & Krea 2 Realtime Engine).\n"
-            "Krea excels at modern digital art, ultra-aesthetic styling, clean compositions, and vibrant lighting atmospheres.\n"
-            "Focus on striking visual concepts, harmonious color schemes, artistic medium, dynamic light, and polished aesthetics.\n"
             "CRITICAL: Output ONLY the final enhanced prompt in English."
         )
     elif target_type == "image-midjourney":
