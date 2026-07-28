@@ -1,8 +1,8 @@
 import os
 from huggingface_hub import hf_hub_download
 
-MODEL_REPO = "Qwen/Qwen2.5-1.5B-Instruct-GGUF"
-MODEL_FILE = "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+MODEL_REPO = "mradermacher/Qwen2.5-3B-Instruct-Uncensored-GGUF"
+MODEL_FILE = "Qwen2.5-3B-Instruct-Uncensored.Q4_K_M.gguf"
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "..", "models")
 
 def download_model():

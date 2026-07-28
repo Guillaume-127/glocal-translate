@@ -1,4 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Navigation Tabs Elements
+    const tabTranslate = document.getElementById('tab-translate');
+    const tabEnhancer = document.getElementById('tab-enhancer');
+    const viewTranslate = document.getElementById('view-translate');
+    const viewEnhancer = document.getElementById('view-enhancer');
+
+    // Translation View Elements
     const sourceText = document.getElementById('source-text');
     const targetText = document.getElementById('target-text');
     const sourceLang = document.getElementById('source-lang');
@@ -14,11 +21,63 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionTextElement = document.getElementById('suggestion-text');
     const acceptSuggestionBtn = document.getElementById('accept-suggestion-btn');
 
+    // Correction Elements
+    const correctionBox = document.getElementById('correction-box');
+    const correctionText = document.getElementById('correction-text');
+    const applyCorrectionBtn = document.getElementById('apply-correction-btn');
+
+    // Prompt Enhancer View Elements
+    const enhancerInput = document.getElementById('enhancer-input');
+    const enhancerOutput = document.getElementById('enhancer-output');
+    const enhancerType = document.getElementById('enhancer-type');
+    const enhanceBtn = document.getElementById('enhance-btn');
+    const copyEnhancerBtn = document.getElementById('copy-enhancer-btn');
+    const enhancerLoading = document.getElementById('enhancer-loading');
+
     let translateTimeout;
     let suggestTimeout;
+    let correctionTimeout;
     let currentSuggestion = "";
+    let suggestedCorrection = "";
 
-    // Event Listeners
+    // Activity Tracking & Heartbeat (Keeps model loaded while active, auto-unloads RAM after 60s idle)
+    let lastUserActivity = Date.now();
+    
+    function recordActivity() {
+        lastUserActivity = Date.now();
+    }
+
+    window.addEventListener('mousemove', recordActivity);
+    window.addEventListener('click', recordActivity);
+    window.addEventListener('keydown', recordActivity);
+    window.addEventListener('scroll', recordActivity);
+
+    setInterval(async () => {
+        if (Date.now() - lastUserActivity < 45000) {
+            try {
+                await fetch('/api/heartbeat', { method: 'POST' });
+            } catch (e) {
+                // Ignore network errors
+            }
+        }
+    }, 20000);
+
+    // Tab Switching Logic
+    tabTranslate.addEventListener('click', () => {
+        tabTranslate.classList.add('active');
+        tabEnhancer.classList.remove('active');
+        viewTranslate.classList.remove('hidden');
+        viewEnhancer.classList.add('hidden');
+    });
+
+    tabEnhancer.addEventListener('click', () => {
+        tabEnhancer.classList.add('active');
+        tabTranslate.classList.remove('active');
+        viewEnhancer.classList.remove('hidden');
+        viewTranslate.classList.add('hidden');
+    });
+
+    // Translation Event Listeners
     sourceText.addEventListener('input', () => {
         updateCharCount();
         handleTyping();
@@ -33,12 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
         sourceText.value = targetText.value;
         targetText.value = tempText;
 
+        hideCorrection();
         if (sourceText.value.trim() !== '') {
             triggerTranslation();
         }
     });
 
-    sourceLang.addEventListener('change', triggerTranslation);
+    sourceLang.addEventListener('change', () => {
+        hideCorrection();
+        triggerTranslation();
+    });
+
     targetLang.addEventListener('change', triggerTranslation);
 
     copyBtn.addEventListener('click', async () => {
@@ -66,16 +130,74 @@ document.addEventListener('DOMContentLoaded', () => {
         sourceText.focus();
     });
 
+    // Apply Correction Button Handler
+    applyCorrectionBtn.addEventListener('click', () => {
+        if (suggestedCorrection) {
+            sourceText.value = suggestedCorrection;
+            hideCorrection();
+            triggerTranslation();
+            sourceText.focus();
+        }
+    });
+
+    // Prompt Enhancer Listeners
+    enhanceBtn.addEventListener('click', triggerEnhancer);
+
+    copyEnhancerBtn.addEventListener('click', async () => {
+        if (!enhancerOutput.value) return;
+        try {
+            await navigator.clipboard.writeText(enhancerOutput.value);
+            const originalTitle = copyEnhancerBtn.getAttribute('title');
+            copyEnhancerBtn.setAttribute('title', 'Copié !');
+            setTimeout(() => copyEnhancerBtn.setAttribute('title', originalTitle), 2000);
+        } catch (err) {
+            console.error('Failed to copy prompt: ', err);
+        }
+    });
+
+    async function triggerEnhancer() {
+        const text = enhancerInput.value.trim();
+        if (!text) return;
+
+        enhancerLoading.classList.remove('hidden');
+        statusText.textContent = 'Génération du prompt...';
+        statusDot.className = 'dot';
+
+        try {
+            const response = await fetch('/api/enhance-prompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: text,
+                    target_type: enhancerType.value
+                })
+            });
+
+            if (!response.ok) throw new Error('API Error');
+
+            const data = await response.json();
+            enhancerOutput.value = data.result;
+
+            statusText.textContent = 'Prêt';
+            statusDot.className = 'dot connected';
+        } catch (error) {
+            console.error(error);
+            enhancerOutput.value = "Erreur lors de la génération du prompt.";
+            statusText.textContent = 'Erreur';
+            statusDot.className = 'dot';
+        } finally {
+            enhancerLoading.classList.add('hidden');
+        }
+    }
+
     function acceptSuggestion() {
         if (currentSuggestion) {
-            // Append suggestion safely
             const val = sourceText.value;
-            // If there's no trailing space, add one.
             const newText = val.endsWith(' ') ? val + currentSuggestion : val + ' ' + currentSuggestion;
             sourceText.value = newText;
             hideSuggestion();
             triggerTranslation();
-            triggerSuggestion(); // look for the next word
+            triggerSuggestion();
         }
     }
 
@@ -85,8 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTyping() {
         hideSuggestion();
+        hideCorrection();
         clearTimeout(translateTimeout);
         clearTimeout(suggestTimeout);
+        clearTimeout(correctionTimeout);
 
         const text = sourceText.value.trim();
         if (text === '') {
@@ -98,11 +222,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Debounce for translation
         translateTimeout = setTimeout(() => {
             triggerTranslation();
-        }, 600); // 600ms wait after typing
+        }, 600);
 
-        // Debounce for suggestion (faster)
+        // Debounce for word suggestion
         suggestTimeout = setTimeout(() => {
             triggerSuggestion();
+        }, 800);
+
+        // Debounce for spelling/grammar correction proposal
+        correctionTimeout = setTimeout(() => {
+            triggerCorrectionCheck();
         }, 800);
     }
 
@@ -112,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadingOverlay.classList.remove('hidden');
         statusText.textContent = 'Traduction...';
-        statusDot.className = 'dot'; // remove connected class (yellow)
+        statusDot.className = 'dot';
 
         try {
             const response = await fetch('/api/translate', {
@@ -136,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(error);
             targetText.value = "Erreur de connexion au modèle local.";
             statusText.textContent = 'Erreur';
-            statusDot.className = 'dot'; // yellow/red meaning error
+            statusDot.className = 'dot';
         } finally {
             loadingOverlay.classList.add('hidden');
         }
@@ -144,8 +273,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function triggerSuggestion() {
         const text = sourceText.value.trim();
-        // Need at least a word to suggest the next one safely
-        if (!text || text.length < 3) {
+        // Do NOT suggest completion if text is empty, too short, or ends with sentence punctuation
+        if (!text || text.length < 3 || text.endsWith('?') || text.endsWith('!') || text.endsWith('.')) {
+            hideSuggestion();
+            return;
+        }
+
+        // If a correction proposal is currently visible, suppress completion suggestions
+        if (!correctionBox.classList.contains('hidden')) {
             hideSuggestion();
             return;
         }
@@ -155,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: sourceText.value, // Send whole value, spaces included
+                    text: sourceText.value,
                     source_lang: sourceLang.value,
                     target_lang: targetLang.value
                 })
@@ -176,8 +311,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function triggerCorrectionCheck() {
+        const text = sourceText.value.trim();
+        if (!text || text.length < 3) {
+            hideCorrection();
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/check-spelling', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    text: text,
+                    lang: sourceLang.value
+                })
+            });
+
+            if (!response.ok) return;
+
+            const data = await response.json();
+            const corrected = data.corrected ? data.corrected.trim() : "";
+            if (corrected && corrected !== text) {
+                suggestedCorrection = corrected;
+                correctionText.textContent = `"${suggestedCorrection}"`;
+                hideSuggestion();
+                correctionBox.classList.remove('hidden');
+            } else {
+                hideCorrection();
+            }
+        } catch (error) {
+            hideCorrection();
+        }
+    }
+
     function hideSuggestion() {
         suggestionBox.classList.add('hidden');
         currentSuggestion = "";
+    }
+
+    function hideCorrection() {
+        correctionBox.classList.add('hidden');
+        suggestedCorrection = "";
     }
 });
