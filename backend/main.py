@@ -1,8 +1,10 @@
 import os
+import sys
 import glob
 import time
 import gc
 import threading
+from collections import deque
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -20,6 +22,33 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Backend Log Capture Buffer
+log_buffer = deque(maxlen=300)
+
+class LogStream:
+    def __init__(self, original_stream):
+        self.original_stream = original_stream
+
+    def write(self, message):
+        try:
+            self.original_stream.write(message)
+            self.original_stream.flush()
+        except Exception:
+            pass
+        if message and message.strip():
+            for line in message.strip().split("\n"):
+                if line.strip():
+                    log_buffer.append(f"[{time.strftime('%H:%M:%S')}] {line.strip()}")
+
+    def flush(self):
+        try:
+            self.original_stream.flush()
+        except Exception:
+            pass
+
+sys.stdout = LogStream(sys.stdout)
+sys.stderr = LogStream(sys.stderr)
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -263,6 +292,14 @@ def heartbeat():
     global last_activity_time
     last_activity_time = time.time()
     return {"status": "ok", "model_loaded": llm is not None}
+
+@app.get("/api/logs")
+def get_logs():
+    return {
+        "logs": list(log_buffer),
+        "model_loaded": llm is not None,
+        "idle_seconds": int(time.time() - last_activity_time)
+    }
 
 @app.post("/api/translate")
 def translate(req: TranslateRequest):

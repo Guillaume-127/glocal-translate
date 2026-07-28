@@ -34,9 +34,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyEnhancerBtn = document.getElementById('copy-enhancer-btn');
     const enhancerLoading = document.getElementById('enhancer-loading');
 
+    // Console Modal Elements
+    const consoleBtn = document.getElementById('console-btn');
+    const consoleModal = document.getElementById('console-modal');
+    const closeConsoleBtn = document.getElementById('close-console-btn');
+    const consoleBackdrop = document.querySelector('.console-backdrop');
+    const consoleLogsText = document.getElementById('console-logs-text');
+    const consoleLogsBody = id => document.getElementById(id);
+    const consoleStatusInfo = document.getElementById('console-status-info');
+    const clearLogsBtn = document.getElementById('clear-logs-btn');
+
     let translateTimeout;
     let suggestTimeout;
     let correctionTimeout;
+    let logsInterval;
     let currentSuggestion = "";
     let suggestedCorrection = "";
 
@@ -61,6 +72,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }, 20000);
+
+    // Console Modal Logic
+    consoleBtn.addEventListener('click', () => {
+        consoleModal.classList.remove('hidden');
+        fetchLogs();
+        logsInterval = setInterval(fetchLogs, 2000);
+    });
+
+    closeConsoleBtn.addEventListener('click', closeConsole);
+    consoleBackdrop.addEventListener('click', closeConsole);
+
+    function closeConsole() {
+        consoleModal.classList.add('hidden');
+        clearInterval(logsInterval);
+    }
+
+    clearLogsBtn.addEventListener('click', () => {
+        consoleLogsText.textContent = "Logs effacés.";
+    });
+
+    async function fetchLogs() {
+        try {
+            const response = await fetch('/api/logs');
+            if (!response.ok) return;
+
+            const data = await response.json();
+            if (data.logs && data.logs.length > 0) {
+                consoleLogsText.textContent = data.logs.join('\n');
+            } else {
+                consoleLogsText.textContent = "Aucun log serveur pour le moment.";
+            }
+
+            const body = document.getElementById('console-logs-body');
+            if (body) {
+                body.scrollTop = body.scrollHeight;
+            }
+
+            if (consoleStatusInfo) {
+                const statusStr = data.model_loaded 
+                    ? "🟢 Statut Modèle : Chargé en RAM" 
+                    : `🟡 Statut Modèle : Déchargé de la RAM (Inactif depuis ${data.idle_seconds}s)`;
+                consoleStatusInfo.textContent = statusStr;
+            }
+        } catch (err) {
+            consoleLogsText.textContent = "Erreur de récupération des logs du serveur.";
+        }
+    }
 
     // Tab Switching Logic
     tabTranslate.addEventListener('click', () => {
@@ -273,13 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function triggerSuggestion() {
         const text = sourceText.value.trim();
-        // Do NOT suggest completion if text is empty, too short, or ends with sentence punctuation
         if (!text || text.length < 3 || text.endsWith('?') || text.endsWith('!') || text.endsWith('.')) {
             hideSuggestion();
             return;
         }
 
-        // If a correction proposal is currently visible, suppress completion suggestions
         if (!correctionBox.classList.contains('hidden')) {
             hideSuggestion();
             return;
