@@ -147,7 +147,7 @@ class SuggestRequest(BaseModel):
 
 class EnhancePromptRequest(BaseModel):
     text: str
-    target_type: str # 'image', 'llm', 'creative'
+    target_type: str
 
 class CheckSpellingRequest(BaseModel):
     text: str
@@ -217,25 +217,70 @@ RULES:
 def generate_enhanced_prompt(text: str, target_type: str) -> str:
     ensure_model_loaded()
     
-    if target_type == "image":
+    if target_type == "image-flux" or target_type == "image":
         sys_instruction = (
-            "You are an expert AI Image Prompt Engineer specializing in Midjourney, Flux, Stable Diffusion, and DALL-E 3.\n"
-            "Expand the user's brief idea into a stunning, vivid, detailed English text-to-image prompt.\n"
-            "Include artistic style, mood, lighting, composition, camera details (e.g., 35mm lens, cinematic lighting, 8k, photorealistic), and atmospheric effects.\n"
-            "CRITICAL: Output ONLY the final enhanced prompt in English. No introductory text, commentary, or markdown framing."
+            "You are a Master Prompt Engineer specializing in FLUX.1 and FLUX.2 by Black Forest Labs.\n"
+            "FLUX models excel with fluent, highly descriptive, natural language prose.\n"
+            "DO NOT use tag-soup or comma-separated buzzwords ('8k, photorealistic, octane render').\n"
+            "Write a vivid, detailed, hierarchical scene description in English: main subject, foreground/background details, lighting quality, atmosphere, and camera framing.\n"
+            "CRITICAL: Output ONLY the final enhanced English prompt text."
+        )
+    elif target_type == "image-sdxl":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for SDXL (Stable Diffusion XL).\n"
+            "SDXL responds best to structured keywords mixed with descriptive phrases.\n"
+            "Include: Main subject, art style, volumetric/rim lighting, composition, lens/camera specs (35mm f/1.4, Hasselblad, bokeh), and detailed surface textures.\n"
+            "Append a recommended Negative Prompt block at the end:\n"
+            "Negative Prompt: blur, lowres, distorted anatomy, bad hands, artifacts\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
+    elif target_type == "image-sd35":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Stable Diffusion 3.5 Large.\n"
+            "SD 3.5 utilizes T5 text encoders and excels at precise natural language combined with detailed optics and material textures.\n"
+            "Structure a detailed scene narrative with exact lighting, physical textures, shadow depth, and camera specs.\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
+    elif target_type == "image-ideogram":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Ideogram 2.0 / Ideogram 4.\n"
+            "Ideogram excels at text rendering, graphic design, typography, posters, vector art, and logo design.\n"
+            "Focus on clean composition, graphic style (vintage poster, neon typography, minimalist vector), color palette, and EXACT text enclosed in quotes (e.g., featuring text \"YOUR TEXT HERE\").\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
+    elif target_type == "image-krea":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Krea AI (Krea 1 & Krea 2 Realtime Engine).\n"
+            "Krea excels at modern digital art, ultra-aesthetic styling, clean compositions, and vibrant lighting atmospheres.\n"
+            "Focus on striking visual concepts, harmonious color schemes, artistic medium, dynamic light, and polished aesthetics.\n"
+            "CRITICAL: Output ONLY the final enhanced prompt in English."
+        )
+    elif target_type == "image-midjourney":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for Midjourney (v6 / v7).\n"
+            "Craft a highly cinematic, aesthetic English prompt using evocative imagery, camera lens details, lighting, and mood.\n"
+            "Append Midjourney parameters at the end (e.g., --ar 16:9 --style raw --v 6.0).\n"
+            "CRITICAL: Output ONLY the final enhanced prompt text in English."
+        )
+    elif target_type == "image-video":
+        sys_instruction = (
+            "You are a Master Prompt Engineer for SOTA AI Video models (Wan 2.1, HunyuanVideo, Luma Dream Machine, Runway Gen-3).\n"
+            "Video prompts require explicit motion dynamics and camera trajectory (e.g., slow dolly zoom, smooth panning, drone tracking shot, 60fps cinematic movement).\n"
+            "Describe the initial scene frame, the subject action, and the camera trajectory over time.\n"
+            "CRITICAL: Output ONLY the final enhanced video prompt in English."
         )
     elif target_type == "llm":
         sys_instruction = (
-            "You are a Master Prompt Engineer for Large Language Models (ChatGPT, Claude, Llama).\n"
+            "You are a Master Prompt Engineer for Large Language Models (ChatGPT, Claude 3.5, Llama 3).\n"
             "Refine and expand the user's idea into a comprehensive, highly effective system/user prompt.\n"
             "Include role definition, target objective, step-by-step instructions, constraints, and desired output format.\n"
-            "CRITICAL: Output ONLY the refined prompt text. No introductory remarks or extra commentary."
+            "CRITICAL: Output ONLY the refined prompt text."
         )
-    else: # creative / general
+    else: # creative
         sys_instruction = (
             "You are a Creative Writing & Prompt Enhancer.\n"
             "Enrich and expand the user's raw prompt into a rich, detailed, captivating prompt with rich vocabulary, context, and clear creative direction.\n"
-            "CRITICAL: Output ONLY the enhanced prompt. No commentary or surrounding text."
+            "CRITICAL: Output ONLY the enhanced prompt."
         )
 
     prompt = f"""<|im_start|>system

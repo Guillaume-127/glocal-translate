@@ -106,9 +106,21 @@
                     <div class="mode-selector-wrapper">
                         <label for="enhancer-type">Style de Prompt :</label>
                         <select id="enhancer-type" class="lang-select">
-                            <option value="image" selected>🎨 Image AI (Midjourney, Flux, SD)</option>
-                            <option value="llm">🤖 Prompt Système / LLM (ChatGPT, Claude)</option>
-                            <option value="creative">📝 Expansion Créative / Texte</option>
+                            <optgroup label="🎨 Modèles d'Images Open-Source & SOTA">
+                                <option value="image-flux" selected>🔥 FLUX.1 / FLUX.2 (Black Forest Labs - Prose naturelle)</option>
+                                <option value="image-ideogram">🔤 Ideogram 2.0 / 4.0 (Design, Typographie & Textes)</option>
+                                <option value="image-krea">⚡ Krea 2 / Realtime (Art numérique, esthétique & concept)</option>
+                                <option value="image-sd35">🌟 Stable Diffusion 3.5 Large (T5 Encoder & Textures)</option>
+                                <option value="image-sdxl">🛠️ SDXL (Keywords structurés + Negative Prompt)</option>
+                                <option value="image-midjourney">🎬 Midjourney v6 / v7 (Cinématique & Paramètres --ar --style)</option>
+                            </optgroup>
+                            <optgroup label="🎬 Génération Vidéo AI">
+                                <option value="image-video">📹 Wan 2.1 / Hunyuan / Luma (Mouvement & Trajectoire caméra)</option>
+                            </optgroup>
+                            <optgroup label="🤖 Autre">
+                                <option value="llm">🤖 Prompt Système / LLM (ChatGPT, Claude, Llama)</option>
+                                <option value="creative">📝 Expansion Créative / Texte</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>
