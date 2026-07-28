@@ -11,7 +11,7 @@
 [![LLM](https://img.shields.io/badge/LLM-Qwen2.5--3B--Uncensored-7A22CE?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/mradermacher/Qwen2.5-3B-Instruct-Uncensored-GGUF)
 [![Hardware](https://img.shields.io/badge/Hardware-CPU_Optimized-FF6F00?style=for-the-badge&logo=intel&logoColor=white)](#-performances--cpu)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25_Offline_%26_Stateless-238636?style=for-the-badge)](README.md)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-The_Unlicense-blue.svg?style=for-the-badge)](LICENSE)
 
 <br/>
 
@@ -112,7 +112,9 @@ glocal-translate/
 
 ## 📄 Licence
 
-Ce projet est distribué sous licence **MIT**. Vous êtes libre de le réutiliser, le modifier et le distribuer.
+Ce projet est placé à 100% dans le **Domaine Public** sous la licence **[The Unlicense](LICENSE)**. 
+
+Vous êtes totalement libre de copier, modifier, vendre, redistribuer et utiliser cet outil pour tout usage commercial ou non commercial, sans aucune restriction, pour le bien public.
 
 ---
 
