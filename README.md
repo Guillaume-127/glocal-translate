@@ -3,13 +3,14 @@
 # 🌐 Glocal Translate & Prompt Enhancer
 
 <p align="center">
-  <b>Traduction locale ultra-fidèle (FR ↔ EN), 100% Non-Censurée (NSFW) et Optimiseur de Prompts IA alimenté par Qwen2.5-3B sur CPU.</b>
+  <b>Traduction locale ultra-fidèle (FR ↔ EN), 100% Non-Censurée (NSFW), Correction Automatique et Optimiseur de Prompts IA SOTA alimenté par Qwen2.5-3B Uncensored sur CPU.</b>
 </p>
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![LLM](https://img.shields.io/badge/LLM-Qwen2.5--3B--Uncensored-7A22CE?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/mradermacher/Qwen2.5-3B-Instruct-Uncensored-GGUF)
-[![CPU Optimized](https://img.shields.io/badge/Hardware-CPU_Optimized-FF6F00?style=for-the-badge&logo=intel&logoColor=white)](#-performances--cpu)
+[![Hardware](https://img.shields.io/badge/Hardware-CPU_Optimized-FF6F00?style=for-the-badge&logo=intel&logoColor=white)](#-performances--cpu)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25_Offline_%26_Stateless-238636?style=for-the-badge)](README.md)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -24,24 +25,33 @@
 
 **Glocal Translate** est une application web de traduction et d'optimisation de prompts **100% privée, autonome et hors-ligne**. Elle fonctionne entièrement sur votre processeur (CPU) sans nécessiter de carte graphique dédiée (GPU), de clé API ni de serveur distant.
 
-Conçu autour du modèle **Qwen2.5-3B-Instruct-Uncensored** (format GGUF Q4_K_M), cet outil élimine toutes les restrictions de modération usuelles pour offrir une fidélité de traduction absolue, y compris pour le langage familier, l'argot, les gros mots et les contenus explicites/NSFW.
+Conçu autour du modèle **Qwen2.5-3B-Instruct-Uncensored** (format GGUF Q4_K_M débridé/abliterated), cet outil élimine toutes les restrictions de modération usuelles pour offrir une fidélité de traduction absolue, y compris pour le langage familier, l'argot, les gros mots et les contenus explicites/NSFW.
 
 ---
 
 ## ✨ Fonctionnalités Clés
 
-* 🔒 **100% Privé & Hors-Ligne** : Vos textes ne quittent jamais votre machine. Aucune télémétrie, aucun tracker.
+* 🔒 **100% Privé, Hors-Ligne & Stateless** : Vos textes ne quittent jamais votre machine. Le modèle LLM local ne conserve aucun historique de vos conversations en mémoire.
 * 🔓 **100% Non-Censuré (NSFW / Argot / Insultes)** : Grâce au modèle débridé (*abliterated*), tout le vocabulaire est traduit avec une fidélité brute sans refus ni moralisation.
-* ⚡ **Optimisé CPU & Déchargement Auto de la RAM** :
+* ⚡ **Optimisé CPU, Déchargement RAM (60s) & Arrêt Automatique** :
   * **Faible empreinte RAM** (~2.0 Go) et vitesse d'exécution élevée (~40 tokens/sec).
-  * **Auto-Unload RAM après 60s d'inactivité** : Libère automatiquement la mémoire vive du processeur si aucune activité n'est détectée pendant 1 minute. Le modèle se recharche instantanément à la requête suivante.
+  * **Auto-Unload RAM (60s)** : Libère la mémoire RAM si aucun usage n'est détecté pendant 1 minute.
+  * **Auto-Shutdown du serveur Python** : Coupe immédiatement le serveur et la console Windows dès la fermeture de la page web ou de l'onglet.
 * 💡 **Correction Orthographique & Grammaticale Intelligente** : Détecte les fautes de frappe, coquilles et accents manquants à la volée (*ex: "salt ca va ?" ➔ "salut ça va ?"*) et propose une correction en 1 clic.
-* ✨ **Mode Prompt Enhancer (Mode dédié)** :
-  * 🎨 **Image AI** (Midjourney, Flux.1, Stable Diffusion, DALL-E 3)
-  * 🤖 **Prompt Système LLM** (ChatGPT, Claude, Llama)
-  * 📝 **Expansion Créative**
-* ⚡ **Autocomplétion Contextuelle** : Propose la suite logique de vos phrases en temps réel dans la langue source choisie.
-* 🚀 **Lanceur 1-Clic (`start.bat`)** : Gestion autonome du venv Python, téléchargement automatique du modèle depuis Hugging Face et ouverture du navigateur.
+* ✨ **Mode Prompt Enhancer par Modèle IA (SOTA & Open-Source)** :
+  * 🔥 **FLUX.1 / FLUX.2** (Prose naturelle & organisation spatiale)
+  * 🌸 **Anima 2B** (Illustration Anime, Manga & 2.5D avec Danbooru tags & negative prompts)
+  * 🔮 **Boogu-Image 10B** (Design, layouts complexes & texte bilingue)
+  * ⚡ **Krea 2** (Hyper-réalisme studio, textures de peau & art numérique)
+  * 🔤 **Ideogram 2.0 / 4.0** (Design graphique, typographie & textes "EXACTS")
+  * 🌟 **Stable Diffusion 3.5 Large** (Encodeur T5 & détails d'optique)
+  * 🛠️ **SDXL** (Keywords structurés + Negative Prompt automatique)
+  * 🎬 **Midjourney v6 / v7** (Style cinématique + paramètres `--ar --style`)
+  * 📹 **AI Video (Wan 2.1 / Hunyuan / Luma)** (Mouvements & trajectoire de caméra)
+* 📜 **Historique Local Optionnel & 100% Privé** :
+  * Bouton discret `Historique Local` dans le footer pour consulter et rappeler vos anciens éléments en 1 clic.
+  * Bouton `🗑️ Supprimer définitivement` et case à cocher **`Désactiver l'historique local`** (enregistrée en permanence dans le navigateur).
+* 🥷 **Lanceur 1-Clic Silencieux (`start.bat`)** : Fenêtre CMD cachée au démarrage et console de logs interactive accessible en bas de page.
 
 ---
 
@@ -51,7 +61,7 @@ Conçu autour du modèle **Qwen2.5-3B-Instruct-Uncensored** (format GGUF Q4_K_M)
 ├── Backend  : Python 3.10+ • FastAPI • Uvicorn • llama-cpp-python (CPU SIMD)
 ├── Frontend : Vanilla HTML5 • CSS3 (Dark Theme Glassmorphism) • JavaScript ES6+
 ├── Modèle   : Qwen2.5-3B-Instruct-Uncensored-GGUF (Q4_K_M ~ 2.0 Go)
-└── Deployment: Script Batch autonome (.bat)
+└── Storage  : localStorage (Navigateur Local - Optionnel & Désactivable)
 ```
 
 ---
@@ -81,45 +91,19 @@ Conçu autour du modèle **Qwen2.5-3B-Instruct-Uncensored** (format GGUF Q4_K_M)
 
 ---
 
-## 💡 Guide d'Utilisation
-
-### 1. 🌐 Mode Traducteur
-* Saisissez votre texte dans le panneau de gauche.
-* La traduction s'effectue automatiquement pendant la saisie avec debouncing.
-* Si une faute de frappe ou d'accent est détectée, un bandeau **💡 Correction suggérée** apparaît. Cliquez sur **Corriger la phrase** pour appliquer la modification.
-
-### 2. ✨ Mode Prompt Enhancer
-* En haut au centre, cliquez sur l'onglet **✨ Prompt Enhancer**.
-* Choisissez votre style (🎨 Image AI, 🤖 Prompt Système LLM, 📝 Expansion Créative).
-* Entrez votre idée brute (ex: *"Un guerrier cybernetic sous la pluie"*).
-* Cliquez sur **Améliorer le Prompt** pour obtenir un prompt professionnel optimisé en Anglais prêt à être copié dans Midjourney / Flux / ChatGPT.
-
----
-
-## 🖥️ Performances CPU & Consommation
-
-| Métrique | Valeur |
-| :--- | :--- |
-| **Empreinte RAM (Modèle chargé)** | ~2.0 Go |
-| **Empreinte RAM (Après 60s d'inactivité)** | **0 Go (Déchargé de la RAM)** |
-| **Vitesse de génération CPU** | ~35 à 55 tokens/sec |
-| **Temps de réponse moyen** | < 1 seconde par phrase |
-
----
-
 ## ⚙️ Structure du Projet
 
 ```text
 glocal-translate/
 ├── backend/
-│   ├── main.py          # Serveur FastAPI, Engine llama-cpp, Auto-Unload & Routes API
+│   ├── main.py          # Serveur FastAPI, Engine llama-cpp, Auto-Unload, Auto-Shutdown & API
 │   └── downloader.py    # Script de téléchargement Hugging Face
 ├── frontend/
-│   ├── index.html       # Interface Web (Traducteur + Prompt Enhancer)
+│   ├── index.html       # Interface Web (Traducteur + Prompt Enhancer + Modales)
 │   ├── style.css        # Styles Dark Mode Modernes & Responsive
-│   └── app.js           # Gestionnaire d'UI, Heartbeat & Requêtes API
+│   └── app.js           # Gestionnaire d'UI, Heartbeat, Console & Historique Local
 ├── models/              # Dossier de stockage du fichier GGUF
-├── start.bat            # Script de lancement automatique 1-clic pour Windows
+├── start.bat            # Script de lancement 1-clic silencieux (CMD masqué)
 ├── requirements.txt     # Dépendances Python
 └── README.md            # Documentation officielle
 ```
