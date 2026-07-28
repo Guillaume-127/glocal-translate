@@ -156,13 +156,19 @@
             </div>
         </main>
 
-        <!-- FOOTER WITH DISCRETE CONSOLE BUTTON AT BOTTOM -->
+        <!-- FOOTER WITH DISCRETE CONSOLE & HISTORY BUTTONS -->
         <footer>
             <div class="footer-content">
-                <button id="console-btn" class="console-btn-footer" title="Consulter la console et les logs du serveur local">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                    <span>Console Logs Serveur</span>
-                </button>
+                <div class="footer-buttons">
+                    <button id="history-btn" class="console-btn-footer" title="Consulter l'historique local">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>Historique Local</span>
+                    </button>
+                    <button id="console-btn" class="console-btn-footer" title="Consulter la console et les logs du serveur local">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+                        <span>Console Logs</span>
+                    </button>
+                </div>
                 <span class="footer-credits">Glocal Translate • 100% Offline CPU Engine</span>
             </div>
         </footer>
@@ -184,6 +190,30 @@
                 </div>
                 <div id="console-logs-body" class="console-logs-body">
                     <pre id="console-logs-text">Chargement des logs du serveur local...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOCAL HISTORY MODAL -->
+        <div id="history-modal" class="console-modal hidden">
+            <div class="console-backdrop" id="history-backdrop"></div>
+            <div class="console-content history-modal-content">
+                <div class="console-header">
+                    <div class="console-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span id="history-modal-title">Historique des Traduction</span>
+                    </div>
+                    <button id="close-history-btn" class="icon-btn close-btn" title="Fermer l'historique">&times;</button>
+                </div>
+                <div class="console-status-bar history-toolbar">
+                    <label class="history-toggle-label">
+                        <input type="checkbox" id="disable-history-checkbox">
+                        <span>Désactiver l'historique local</span>
+                    </label>
+                    <button id="clear-history-btn" class="danger-btn-sm">🗑️ Supprimer définitivement</button>
+                </div>
+                <div id="history-list-body" class="history-list-body">
+                    <!-- Dynamic history items -->
                 </div>
             </div>
         </div>

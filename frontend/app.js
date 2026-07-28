@@ -40,9 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeConsoleBtn = document.getElementById('close-console-btn');
     const consoleBackdrop = document.querySelector('.console-backdrop');
     const consoleLogsText = document.getElementById('console-logs-text');
-    const consoleLogsBody = id => document.getElementById(id);
     const consoleStatusInfo = document.getElementById('console-status-info');
     const clearLogsBtn = document.getElementById('clear-logs-btn');
+
+    // History Modal Elements
+    const historyBtn = document.getElementById('history-btn');
+    const historyModal = document.getElementById('history-modal');
+    const closeHistoryBtn = document.getElementById('close-history-btn');
+    const historyBackdrop = document.getElementById('history-backdrop');
+    const historyModalTitle = document.getElementById('history-modal-title');
+    const disableHistoryCheckbox = document.getElementById('disable-history-checkbox');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const historyListBody = document.getElementById('history-list-body');
 
     let translateTimeout;
     let suggestTimeout;
@@ -56,13 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await fetch('/api/heartbeat', { method: 'POST' });
         } catch (e) {
-            // Server might be shutting down
+            // Server shutting down
         }
     }, 4000);
 
     fetch('/api/heartbeat', { method: 'POST' }).catch(() => {});
 
-    // Send instant shutdown signal to Python backend when closing tab or quitting browser
     window.addEventListener('beforeunload', () => {
         if (navigator.sendBeacon) {
             navigator.sendBeacon('/api/shutdown');
@@ -116,6 +124,157 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             consoleLogsText.textContent = "Erreur de récupération des logs du serveur.";
         }
+    }
+
+    // Local History System (Stored 100% in Browser localStorage)
+    function isHistoryDisabled() {
+        return localStorage.getItem('glocal_history_disabled') === 'true';
+    }
+
+    disableHistoryCheckbox.checked = isHistoryDisabled();
+
+    disableHistoryCheckbox.addEventListener('change', (e) => {
+        localStorage.setItem('glocal_history_disabled', e.target.checked);
+    });
+
+    historyBtn.addEventListener('click', () => {
+        renderHistory();
+        historyModal.classList.remove('hidden');
+    });
+
+    closeHistoryBtn.addEventListener('click', closeHistory);
+    historyBackdrop.addEventListener('click', closeHistory);
+
+    function closeHistory() {
+        historyModal.classList.add('hidden');
+    }
+
+    clearHistoryBtn.addEventListener('click', () => {
+        const isTranslate = !viewTranslate.classList.contains('hidden');
+        const modeLabel = isTranslate ? "des traductions" : "des prompts";
+        if (confirm(`Voulez-vous vraiment supprimer définitivement l'historique local ${modeLabel} ?`)) {
+            if (isTranslate) {
+                localStorage.removeItem('glocal_history_translate');
+            } else {
+                localStorage.removeItem('glocal_history_enhancer');
+            }
+            renderHistory();
+        }
+    });
+
+    function saveTranslateHistory(source, target, sLang, tLang) {
+        if (isHistoryDisabled() || !source.trim() || !target.trim()) return;
+        let list = JSON.parse(localStorage.getItem('glocal_history_translate') || '[]');
+        // Don't save identical consecutive entry
+        if (list.length > 0 && list[0].source === source.trim() && list[0].target === target.trim()) return;
+
+        list.unshift({
+            id: Date.now(),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            date: new Date().toLocaleDateString(),
+            source: source.trim(),
+            target: target.trim(),
+            sourceLang: sLang,
+            targetLang: tLang
+        });
+        if (list.length > 50) list.pop();
+        localStorage.setItem('glocal_history_translate', JSON.stringify(list));
+    }
+
+    function saveEnhancerHistory(input, output, type) {
+        if (isHistoryDisabled() || !input.trim() || !output.trim()) return;
+        let list = JSON.parse(localStorage.getItem('glocal_history_enhancer') || '[]');
+        if (list.length > 0 && list[0].input === input.trim() && list[0].output === output.trim()) return;
+
+        list.unshift({
+            id: Date.now(),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            date: new Date().toLocaleDateString(),
+            input: input.trim(),
+            output: output.trim(),
+            type: type
+        });
+        if (list.length > 50) list.pop();
+        localStorage.setItem('glocal_history_enhancer', JSON.stringify(list));
+    }
+
+    function renderHistory() {
+        const isTranslate = !viewTranslate.classList.contains('hidden');
+        historyListBody.innerHTML = '';
+
+        if (isTranslate) {
+            historyModalTitle.textContent = "Historique des Traductions";
+            const list = JSON.parse(localStorage.getItem('glocal_history_translate') || '[]');
+            if (list.length === 0) {
+                historyListBody.innerHTML = `<div class="history-empty">Aucune traduction enregistrée dans l'historique local.</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'history-item';
+                el.innerHTML = `
+                    <div class="history-item-header">
+                        <span class="history-item-tag">🌐 ${item.sourceLang} ➔ ${item.targetLang}</span>
+                        <span class="history-item-time">${item.date} ${item.time}</span>
+                    </div>
+                    <div class="history-item-body">
+                        <div class="history-source">${escapeHtml(item.source)}</div>
+                        <div class="history-arrow">➔</div>
+                        <div class="history-target">${escapeHtml(item.target)}</div>
+                    </div>
+                `;
+                el.addEventListener('click', () => {
+                    sourceLang.value = item.sourceLang;
+                    targetLang.value = item.targetLang;
+                    sourceText.value = item.source;
+                    targetText.value = item.target;
+                    updateCharCount();
+                    closeHistory();
+                    navigator.clipboard.writeText(item.target).catch(() => {});
+                });
+                historyListBody.appendChild(el);
+            });
+        } else {
+            historyModalTitle.textContent = "Historique des Prompts Améliorés";
+            const list = JSON.parse(localStorage.getItem('glocal_history_enhancer') || '[]');
+            if (list.length === 0) {
+                historyListBody.innerHTML = `<div class="history-empty">Aucun prompt enregistré dans l'historique local.</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'history-item';
+                el.innerHTML = `
+                    <div class="history-item-header">
+                        <span class="history-item-tag">✨ ${item.type}</span>
+                        <span class="history-item-time">${item.date} ${item.time}</span>
+                    </div>
+                    <div class="history-item-body">
+                        <div class="history-source"><b>Idée :</b> ${escapeHtml(item.input)}</div>
+                        <div class="history-target"><b>Prompt :</b> ${escapeHtml(item.output)}</div>
+                    </div>
+                `;
+                el.addEventListener('click', () => {
+                    enhancerType.value = item.type;
+                    enhancerInput.value = item.input;
+                    enhancerOutput.value = item.output;
+                    closeHistory();
+                    navigator.clipboard.writeText(item.output).catch(() => {});
+                });
+                historyListBody.appendChild(el);
+            });
+        }
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     // Tab Switching Logic
@@ -234,6 +393,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             enhancerOutput.value = data.result;
 
+            saveEnhancerHistory(text, data.result, enhancerType.value);
+
             statusText.textContent = 'Prêt';
             statusDot.className = 'dot connected';
         } catch (error) {
@@ -314,6 +475,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             targetText.value = data.result;
+
+            saveTranslateHistory(text, data.result, sourceLang.value, targetLang.value);
             
             statusText.textContent = 'Prêt';
             statusDot.className = 'dot connected';
