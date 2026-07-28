@@ -51,27 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSuggestion = "";
     let suggestedCorrection = "";
 
-    // Activity Tracking & Heartbeat (Keeps model loaded while active, auto-unloads RAM after 60s idle)
-    let lastUserActivity = Date.now();
-    
-    function recordActivity() {
-        lastUserActivity = Date.now();
-    }
-
-    window.addEventListener('mousemove', recordActivity);
-    window.addEventListener('click', recordActivity);
-    window.addEventListener('keydown', recordActivity);
-    window.addEventListener('scroll', recordActivity);
-
+    // Heartbeat & Auto-Shutdown on Tab Close
     setInterval(async () => {
-        if (Date.now() - lastUserActivity < 45000) {
-            try {
-                await fetch('/api/heartbeat', { method: 'POST' });
-            } catch (e) {
-                // Ignore network errors
-            }
+        try {
+            await fetch('/api/heartbeat', { method: 'POST' });
+        } catch (e) {
+            // Server might be shutting down
         }
-    }, 20000);
+    }, 4000);
+
+    fetch('/api/heartbeat', { method: 'POST' }).catch(() => {});
+
+    // Send instant shutdown signal to Python backend when closing tab or quitting browser
+    window.addEventListener('beforeunload', () => {
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('/api/shutdown');
+        } else {
+            fetch('/api/shutdown', { method: 'POST', keepalive: true }).catch(() => {});
+        }
+    });
 
     // Console Modal Logic
     consoleBtn.addEventListener('click', () => {

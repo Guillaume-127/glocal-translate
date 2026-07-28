@@ -75,7 +75,9 @@ MODEL_PATH = find_model_path()
 llm = None
 llm_lock = threading.Lock()
 last_activity_time = time.time()
+last_heartbeat_time = time.time()
 IDLE_TIMEOUT_SECONDS = 60 # Auto-unload model from RAM after 60s of inactivity
+SERVER_AUTOSHUTDOWN_SECONDS = 15 # Auto-shutdown Python process if no browser tab sends heartbeat for 15s
 
 def load_model():
     global llm
@@ -112,12 +114,18 @@ def ensure_model_loaded():
         raise HTTPException(status_code=500, detail="Failed to load LLM into memory.")
 
 def inactivity_checker():
-    """Daemon thread checking for 60 seconds of inactivity."""
+    """Daemon thread checking for 60s model RAM unload and 15s tab exit auto-shutdown."""
     while True:
-        time.sleep(5)
+        time.sleep(3)
+        now = time.time()
         with llm_lock:
-            if llm is not None and (time.time() - last_activity_time > IDLE_TIMEOUT_SECONDS):
+            # 1. Unload LLM from RAM if inactive for 60s
+            if llm is not None and (now - last_activity_time > IDLE_TIMEOUT_SECONDS):
                 unload_model()
+            # 2. Shutdown server process completely if no browser tab heartbeat for 15s
+            if now - last_heartbeat_time > SERVER_AUTOSHUTDOWN_SECONDS:
+                print("[Backend] 🛑 No active browser tabs detected for 15s. Shutting down Python backend process...")
+                os._exit(0)
 
 # Load model initially on backend startup
 load_model()
@@ -289,9 +297,16 @@ RULES:
 
 @app.post("/api/heartbeat")
 def heartbeat():
-    global last_activity_time
+    global last_activity_time, last_heartbeat_time
     last_activity_time = time.time()
+    last_heartbeat_time = time.time()
     return {"status": "ok", "model_loaded": llm is not None}
+
+@app.post("/api/shutdown")
+def shutdown_server():
+    print("[Backend] 🛑 Browser tab closed. Shutting down Python backend process...")
+    threading.Timer(0.3, lambda: os._exit(0)).start()
+    return {"status": "shutting_down"}
 
 @app.get("/api/logs")
 def get_logs():
